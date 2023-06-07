@@ -27,24 +27,13 @@ namespace AdminServer.Controllers
             grpcURL = "https://localhost:7157";
         }
 
-        [HttpPost("users")]
-        public async Task<ActionResult> PostUser([FromBody] UserDTO user)
+        [HttpPost("mecanicos")]
+        public async Task<ActionResult> PostUser([FromBody] MecanicoDTO user)
         {
             using var channel = GrpcChannel.ForAddress(grpcURL);
             client = new Admin.AdminClient(channel);
-            var reply = await client.PostUserAsync(user);
+            var reply = await client.PostMecanicoAsync(user);
             return Ok(reply.Message);
         }
-
-        [HttpDelete("users/{id}")]
-        public async Task<ActionResult> DeleteUser([FromRoute] int id)
-        {
-            using var channel = GrpcChannel.ForAddress(grpcURL);
-            client = new Admin.AdminClient(channel);
-            var reply = await client.DeleteUserAsync(new Id { Id_ = id });
-            return Ok(reply.Message);
-        }
-
-
     }
 }

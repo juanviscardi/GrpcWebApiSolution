@@ -8,20 +8,15 @@ package admin;
 service Admin {
 
   // Functions availables
-  rpc PostUser(UserDTO) returns (MessageReply);
-  rpc DeleteUser(Id) returns (MessageReply);
+  rpc PostMecanico(MecanicoDTO) returns (MessageReply);
  
 }
 
-  message UserDTO{
-	int32 id = 1;
-	string name = 2;
+ message MecanicoDTO {
+	string name = 1;
+	string password = 2;
+	string tipo = 3;
 }
-
-message Id {
-	int32 id = 1;
-}
-
 
 message MessageReply {
 	string message = 1;
