@@ -62,11 +62,11 @@ namespace GrpcSGrpcMainServer.ServerProgram
                 {
                     while (isClientConnected)
                     {
-                        var dataLength = new byte[Protocol.WordLength];
+                        var dataLength = new byte[ProtocolSpecification.fixedLength];
                         int totalReceived = 0;
-                        while (totalReceived < Protocol.WordLength)
+                        while (totalReceived < ProtocolSpecification.fixedLength)
                         {
-                            var received = await networkStream.ReadAsync(dataLength, totalReceived, Protocol.WordLength - totalReceived).ConfigureAwait(false);
+                            var received = await networkStream.ReadAsync(dataLength, totalReceived, ProtocolSpecification.fixedLength - totalReceived).ConfigureAwait(false);
                             if (received == 0)
                             {
                                 throw new SocketException();

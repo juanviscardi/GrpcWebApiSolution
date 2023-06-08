@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Common;
+using Common.Interfaces;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using Common;
-using Common.Interfaces;
 
 
 namespace ClientProgram
@@ -39,7 +39,7 @@ namespace ClientProgram
                     }
                     byte[] data = Encoding.UTF8.GetBytes(word);
                     byte[] dataLength = BitConverter.GetBytes(data.Length);
-                    await networkStream.WriteAsync(dataLength, 0, Protocol.WordLength).ConfigureAwait(false);
+                    await networkStream.WriteAsync(dataLength, 0, ProtocolSpecification.fixedLength).ConfigureAwait(false);
                     await networkStream.WriteAsync(data, 0, data.Length).ConfigureAwait(false);
                     if (word.Equals("exit"))
                     {
