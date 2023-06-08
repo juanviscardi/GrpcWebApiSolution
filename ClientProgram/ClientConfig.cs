@@ -1,10 +1,10 @@
 namespace ClientProgram
 {
-    static class ClientConfig
+    public class ClientConfig
     {
-        public static string ServerIpConfigKey = "ServerIpAddress";
-        public static string SeverPortConfigKey = "ServerPort";
-        public static string ClientIpConfigKey = "ClientIpAddress";
-        public static string ClientPortConfigKey = "ClientPort";
+        public static string serverIPConfigKey = "ServerAddress";
+        public static string serverPortconfigKey = "ServerPort";
+        public static string ClientIPConfigKey = "ClientAddress";
+        public static string ClientPortconfigKey = "ClientPort";
     }
 }

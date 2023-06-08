@@ -1,9 +1,10 @@
 ﻿namespace GrpcMainServer
 {
-    public static class ServerConfig
+    public class ServerConfig
     {
-        public static string ServerIpConfigKey = "ServerIpAddress";
-        public static string SeverPortConfigKey = "ServerPort";
+        public static string serverIPConfigKey = "ServerAddress";
+        public static string serverPortconfigKey = "ServerPort";
+        public static string usernameConfigKey = "UsernameConfigKey";
+        public static string passwordConfigKey = "PasswordConfigKey";
     }
 }
-

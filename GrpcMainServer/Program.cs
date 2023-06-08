@@ -14,8 +14,8 @@ namespace GrpcMainServer
         {
 
 
-            var serverIpAddress = SettingsMgr.ReadSetting(ServerConfig.ServerIpConfigKey);
-            var serverPort = SettingsMgr.ReadSetting(ServerConfig.SeverPortConfigKey);
+            var serverIpAddress = SettingsMgr.ReadSetting(ServerConfig.serverIPConfigKey);
+            var serverPort = SettingsMgr.ReadSetting(ServerConfig.serverPortconfigKey);
             Console.WriteLine($"Server is starting in address {serverIpAddress} and port {serverPort}");
 
             Server server = new Server(serverIpAddress, serverPort);
