@@ -8,7 +8,7 @@ using Common;
 using Common.Interfaces;
 using GrpcMainServer;
 using Microsoft.AspNetCore.Hosting.Server;
-
+using Repuesto = Common.Repuesto;
 
 
 namespace GrpcSGrpcMainServer.ServerProgram

@@ -33,7 +33,7 @@ namespace GrpcMainServer {
             return Task.FromResult(new MessageReply { Message = "test put" });
         }
 
-        public override Task<MessageReply> DeleteRepuesto(RepuestoDTO request, ServerCallContext context)
+        public override Task<MessageReply> DeleteRepuesto(Id request, ServerCallContext context)
         {
             //BusinessLogic session = BusinessLogic.GetInstance();
             //Console.WriteLine("Antes de crear el usuario con nombre {0}", request.Name);

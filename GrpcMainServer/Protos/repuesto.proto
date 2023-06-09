@@ -10,7 +10,7 @@ service Repuesto {
   // Functions availables
   rpc PostRepuesto(RepuestoDTO) returns (MessageReply);
   rpc GetRepuesto(Id) returns (MessageReply);
-  rpc PutRepuesto(Id) returns (MessageReply);
+  rpc PutRepuesto(RepuestoDTO) returns (MessageReply);
   rpc DeleteRepuesto(Id) returns (MessageReply);
 }
 

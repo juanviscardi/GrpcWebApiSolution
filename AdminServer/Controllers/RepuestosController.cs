@@ -24,7 +24,7 @@ namespace AdminServer.Controllers
         [HttpPost]
         public async Task<ActionResult> PostRepuesto(RepuestoDTO repuesto)
         {
-            //using var channel = GrpcChannel.ForAddress(grpcURL);
+            using var channel = GrpcChannel.ForAddress(grpcURL);
             //Admin.AdminClient client = new Admin.AdminClient(channel);
             //var reply = await client.PostRepuestoAsync(repuesto);
             return Ok("hola");
