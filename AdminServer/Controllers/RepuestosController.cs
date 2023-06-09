@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Common;
 using Common.Interfaces;
@@ -25,27 +26,36 @@ namespace AdminServer.Controllers
         public async Task<ActionResult> PostRepuesto(RepuestoDTO repuesto)
         {
             using var channel = GrpcChannel.ForAddress(grpcURL);
-            //Admin.AdminClient client = new Admin.AdminClient(channel);
-            //var reply = await client.PostRepuestoAsync(repuesto);
-            return Ok("hola");
+            Repuesto.RepuestoClient client = new Repuesto.RepuestoClient(channel);
+            var reply = await client.PostRepuestoAsync(repuesto);
+            return Ok(reply.Message);
         }
 
-        [HttpDelete]
-        public async Task<ActionResult> DeleteRepuesto(int id)
+        [HttpDelete("id")]
+        public async Task<ActionResult> DeleteRepuesto(Id id)
         {
-            //using var channel = GrpcChannel.ForAddress(grpcURL);
-            //Admin.AdminClient client = new Admin.AdminClient(channel);
-            //var reply = await client.DeleteRepuestoAsync(id);
-            return Ok("hola");
+            using var channel = GrpcChannel.ForAddress(grpcURL);
+            Repuesto.RepuestoClient client = new Repuesto.RepuestoClient(channel);
+            var reply = await client.DeleteRepuestoAsync(id);
+            return Ok(reply.Message);
         }
 
-        [HttpGet("/{id}")]
-        public async Task<ActionResult> GetRepuesto([FromRoute] int id)
+        [HttpGet("id")]
+        public async Task<ActionResult> GetRepuesto([FromRoute] Id id)
         {
-            //using var channel = GrpcChannel.ForAddress(grpcURL);
-            //Admin.AdminClient client = new Admin.AdminClient(channel);
-            //var reply = await client.GetRepuestoAsync(id);
-            return Ok("hola");
+            using var channel = GrpcChannel.ForAddress(grpcURL);
+            Repuesto.RepuestoClient client = new Repuesto.RepuestoClient(channel);
+            var reply = await client.GetRepuestoAsync(id);
+            return Ok(reply.Message);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult> PutRepuesto(RepuestoDTO repuesto)
+        {
+            using var channel = GrpcChannel.ForAddress(grpcURL);
+            Repuesto.RepuestoClient client = new Repuesto.RepuestoClient(channel);
+            var reply = await client.PutRepuestoAsync(repuesto);
+            return Ok(reply.Message);
         }
 
         //[HttpGet]
@@ -56,14 +66,5 @@ namespace AdminServer.Controllers
         //    var reply = await client.GetRepuestosAsync();
         //    return Ok(reply.Message);
         //}
-
-        [HttpPut("/{id}")]
-        public async Task<ActionResult> PutRepuesto([FromRoute] int id)
-        {
-            //using var channel = GrpcChannel.ForAddress(grpcURL);
-            //Admin.AdminClient client = new Admin.AdminClient(channel);
-            //var reply = await client.PutRepuestoAsync(id);
-            return Ok("hola");
-        }
     }
 }
