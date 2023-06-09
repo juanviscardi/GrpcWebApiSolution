@@ -1,0 +1,69 @@
+﻿using System;
+using System.Threading.Tasks;
+using Common;
+using Common.Interfaces;
+using Grpc.Net.Client;
+using Microsoft.AspNetCore.Mvc;
+
+namespace AdminServer.Controllers
+{
+    [Route("repuestos")]
+    [ApiController]
+    public class RepuestosController : ControllerBase
+    {
+        private string grpcURL;
+
+        static readonly ISettingsManager settingsMng = new SettingsManager();
+        public RepuestosController()
+        {
+            AppContext.SetSwitch(
+                  "System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+            grpcURL = settingsMng.ReadSetting(ServerConfig.GrpcURL);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> PostRepuesto(RepuestoDTO repuesto)
+        {
+            //using var channel = GrpcChannel.ForAddress(grpcURL);
+            //Admin.AdminClient client = new Admin.AdminClient(channel);
+            //var reply = await client.PostRepuestoAsync(repuesto);
+            return Ok("hola");
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult> DeleteRepuesto(int id)
+        {
+            //using var channel = GrpcChannel.ForAddress(grpcURL);
+            //Admin.AdminClient client = new Admin.AdminClient(channel);
+            //var reply = await client.DeleteRepuestoAsync(id);
+            return Ok("hola");
+        }
+
+        [HttpGet("/{id}")]
+        public async Task<ActionResult> GetRepuesto([FromRoute] int id)
+        {
+            //using var channel = GrpcChannel.ForAddress(grpcURL);
+            //Admin.AdminClient client = new Admin.AdminClient(channel);
+            //var reply = await client.GetRepuestoAsync(id);
+            return Ok("hola");
+        }
+
+        //[HttpGet]
+        //public async Task<ActionResult> GetRepuestos()
+        //{
+        //    using var channel = GrpcChannel.ForAddress(grpcURL);
+        //    Admin.AdminClient client = new Admin.AdminClient(channel);
+        //    var reply = await client.GetRepuestosAsync();
+        //    return Ok(reply.Message);
+        //}
+
+        [HttpPut("/{id}")]
+        public async Task<ActionResult> PutRepuesto([FromRoute] int id)
+        {
+            //using var channel = GrpcChannel.ForAddress(grpcURL);
+            //Admin.AdminClient client = new Admin.AdminClient(channel);
+            //var reply = await client.PutRepuestoAsync(id);
+            return Ok("hola");
+        }
+    }
+}

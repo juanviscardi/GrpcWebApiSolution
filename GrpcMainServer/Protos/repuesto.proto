@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option csharp_namespace = "GrpcMainServer";
+
+package repuesto;
+
+// The admin service definition.
+service Repuesto {
+
+  // Functions availables
+  rpc PostRepuesto(RepuestoDTO) returns (MessageReply);
+  rpc GetRepuesto(Id) returns (MessageReply);
+  rpc PutRepuesto(Id) returns (MessageReply);
+  rpc DeleteRepuesto(Id) returns (MessageReply);
+}
+
+ message RepuestoDTO {
+	string id = 1;
+	string name = 2;
+	string proveedor = 3;
+	string marca = 4;
+}
+
+message MessageReply {
+	string message = 1;
+}
+
+message Id {
+	int32 id = 1;
+}
