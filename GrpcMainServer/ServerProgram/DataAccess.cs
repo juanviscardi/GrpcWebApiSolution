@@ -11,7 +11,7 @@ namespace GrpcMainServer.ServerProgram
         public List<Mensaje> mensajes { get; set; }
         private static DataAccess instance;
         private static readonly object singletonlock = new object();
-        private int userId;
+        private int repuestoId;
 
         public static DataAccess GetInstance()
         {
@@ -30,20 +30,20 @@ namespace GrpcMainServer.ServerProgram
             return instance;
         }
 
-        //public int NextUserID
-        //{
-        //    get
-        //    {
-        //        int res = userId;
-        //        userId++;
-        //        return res;
+        public int NextRepuestoID
+        {
+            get
+            {
+                int res = repuestoId;
+                repuestoId++;
+                return repuestoId;
 
-        //    }
-        //    private set
-        //    {
-        //        userId = value;
-        //    }
-        //}
+            }
+            private set
+            {
+                repuestoId = value;
+            }
+        }
 
     }
 }

@@ -32,12 +32,16 @@ namespace AdminServer.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteRepuesto([FromRoute] Id id)
+        public async Task<ActionResult> DeleteRepuesto(int id)
         {
             using var channel = GrpcChannel.ForAddress(grpcURL);
             Repuesto.RepuestoClient client = new Repuesto.RepuestoClient(channel);
-            var reply = await client.DeleteRepuestoAsync(id);
-            return Ok(reply.Message);
+            var reply = await client.DeleteRepuestoAsync(new Id { Id_ = id });
+            if(reply.Message == "No existe")
+            {
+                return NotFound();
+            }
+            return Ok($"Se ha eliminado el repuesto de ID {id}");
         }
 
         [HttpGet("{id}")]

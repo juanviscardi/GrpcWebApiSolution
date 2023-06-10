@@ -15,7 +15,6 @@ namespace GrpcMainServer.ServerProgram
         private static readonly SemaphoreSlim _agregarCategoria = new SemaphoreSlim(initialCount: 1, maxCount: 1);
         private static readonly SemaphoreSlim _asociarCategoria = new SemaphoreSlim(initialCount: 1, maxCount: 1);
 
-
         public static BusinessLogic GetInstance()
         {
             lock (singletonlock)
@@ -82,7 +81,7 @@ namespace GrpcMainServer.ServerProgram
         {
             string respuesta = "";
             Common.Repuesto repu = new Common.Repuesto(
-                                                          this.GetRepuestos().Count().ToString(),
+                                                           this.da.NextRepuestoID.ToString(),
                                                            name,
                                                            proveedor,
                                                            marca);
@@ -99,6 +98,19 @@ namespace GrpcMainServer.ServerProgram
             }
             _agregarRepuesto.Release();
             return respuesta;
+        }
+
+        internal async Task<string> DeleteRepuestoAsync(string id)
+        {
+            Common.Repuesto respuestoAEliminar = this.GetRepuestoById(id);
+            if(respuestoAEliminar == null)
+            {
+                return "No existe";
+            }
+            await _asociarCategoria.WaitAsync();
+            da.repuestos.Remove(respuestoAEliminar);
+            _asociarCategoria.Release();
+            return "Eliminado";
         }
 
         internal async Task<string> CreateCategoriaAsync(string categoria)
