@@ -21,8 +21,17 @@ namespace GrpcMainServer {
         {
             BusinessLogic session = BusinessLogic.GetInstance();
             Common.Repuesto repuesto = session.GetRepuestoById(request.Id_.ToString());
+            if (repuesto == null)
+            {
+                RepuestoResponse notFoundResponse = new RepuestoResponse
+                {
+                    Found = false
+                };
+                return Task.FromResult(notFoundResponse);
+            }
             RepuestoResponse repuestoResponse = new RepuestoResponse
             {
+                Found = true,
                 Id = repuesto.Id,
                 Name = repuesto.Name,
                 Proveedor = repuesto.Proveedor,
@@ -53,7 +62,7 @@ namespace GrpcMainServer {
             List<Common.Repuesto> repuestos = session.GetRepuestos();
 
             ListRepuestos response = new ListRepuestos();
-            response.Repuestos.AddRange(repuestos.Select(repuesto => new RepuestoResponse
+            response.Repuestos.AddRange(repuestos.Select(repuesto => new RepuestoDTO
             {
                 Id = repuesto.Id,
                 Name = repuesto.Name,

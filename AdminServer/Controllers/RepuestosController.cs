@@ -46,7 +46,16 @@ namespace AdminServer.Controllers
             using var channel = GrpcChannel.ForAddress(grpcURL);
             Repuesto.RepuestoClient client = new Repuesto.RepuestoClient(channel);
 
-            RepuestoResponse repuesto = await client.GetRepuestoAsync(new Id{ Id_ = id });
+            RepuestoResponse repuestoResponse = await client.GetRepuestoAsync(new Id { Id_ = id });
+            if (!repuestoResponse.Found)
+            {
+                return NotFound();
+            }
+            Common.Repuesto repuesto = new Common.Repuesto(
+                repuestoResponse.Id,
+                repuestoResponse.Name,
+                repuestoResponse.Proveedor,
+                repuestoResponse.Marca);
             return Ok(repuesto);
         }
 

@@ -20,6 +20,14 @@ message RepuestoRequest {
 }
 
 message RepuestoResponse {
+	bool found = 1;
+	string id = 2;
+	string name = 3;
+	string proveedor = 4;
+	string marca = 5;
+}
+
+message RepuestoDTO {
 	string id = 1;
 	string name = 2;
 	string proveedor = 3;
@@ -27,7 +35,7 @@ message RepuestoResponse {
 }
 
 message ListRepuestos {
-    repeated RepuestoResponse repuestos = 1;
+    repeated RepuestoDTO repuestos = 1;
 }
 
 message MessageReply {
