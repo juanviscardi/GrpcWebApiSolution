@@ -17,12 +17,18 @@ namespace GrpcMainServer {
             return new MessageReply { Message = message };
         }
 
-        public override Task<MessageReply> GetRepuesto(Id request, ServerCallContext context)
+        public override Task<RepuestoResponse> GetRepuesto(Id request, ServerCallContext context)
         {
-            //BusinessLogic session = BusinessLogic.GetInstance();
-            //Console.WriteLine("Antes de crear el usuario con nombre {0}", request.Name);
-            //string message = session.CreateUser(request.Name);
-            return Task.FromResult(new MessageReply { Message = "test get" });
+            BusinessLogic session = BusinessLogic.GetInstance();
+            Common.Repuesto repuesto = session.GetRepuestoById(request.Id_.ToString());
+            RepuestoResponse repuestoResponse = new RepuestoResponse
+            {
+                Id = repuesto.Id,
+                Name = repuesto.Name,
+                Proveedor = repuesto.Proveedor,
+                Marca = repuesto.Marca
+            };
+            return Task.FromResult(repuestoResponse);
         }
 
         public override Task<MessageReply> PutRepuesto(RepuestoRequest request, ServerCallContext context)

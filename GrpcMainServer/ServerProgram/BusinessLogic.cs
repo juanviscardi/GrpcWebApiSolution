@@ -34,6 +34,11 @@ namespace GrpcMainServer.ServerProgram
             return da.repuestos;
         }
 
+        internal Common.Repuesto GetRepuestoById(string id)
+        {
+            return da.repuestos.FirstOrDefault(x => x.Id == id);
+        }
+
         internal List<Common.Usuario> GetUsuarios()
         {
             return da.usuarios;
@@ -51,7 +56,7 @@ namespace GrpcMainServer.ServerProgram
 
         internal async Task<string> CreateUserAsync(string name, string password)
         {
-            Usuario user = new Usuario(name, password,"mecanico");
+            Usuario user = new Usuario(name, password, "mecanico");
             await _agregarUsuario.WaitAsync();
             string respuesta = "";
             if (!this.GetUsuarios().Contains(user))
@@ -73,7 +78,7 @@ namespace GrpcMainServer.ServerProgram
             return respuesta;
         }
 
-        internal async Task<string> CreateRepuestoAsync(string name, string proveedor, string marca )
+        internal async Task<string> CreateRepuestoAsync(string name, string proveedor, string marca)
         {
             string respuesta = "";
             Common.Repuesto repu = new Common.Repuesto(
@@ -146,34 +151,5 @@ namespace GrpcMainServer.ServerProgram
             _asociarCategoria.Release();
             return respuesta;
         }
-
-            //internal string CreateUser(string name)
-            //{
-            //    System.Console.WriteLine("Voy a crear el usuario: {0}",name);
-            //    List<User> users = da.Users;
-            //    lock (users)
-            //    {
-            //        User newUser = new User()
-            //        {
-            //            Name = name,
-            //            Id = da.NextUserID
-            //        };
-
-            //        bool alreadyExists = users.Contains(newUser);
-            //        return alreadyExists ? "Ya existe el usuario" : "Usuario creado correctamente";
-            //    }
-            //}
-
-            //internal bool DeleteUser(int id)
-            //{
-            //    List<User> users = da.Users;
-            //    bool success;
-            //    lock (users)
-            //    {
-            //        User userToDelete = users.Find(i => i.Id == id);
-            //        success = users.Remove(userToDelete);
-            //    }
-            //    return success;
-            //}
-        }
+    }
 }

@@ -41,12 +41,13 @@ namespace AdminServer.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetRepuesto([FromRoute] Id id)
+        public async Task<ActionResult> GetRepuesto(int id)
         {
             using var channel = GrpcChannel.ForAddress(grpcURL);
             Repuesto.RepuestoClient client = new Repuesto.RepuestoClient(channel);
-            var reply = await client.GetRepuestoAsync(id);
-            return Ok(reply.Message);
+
+            RepuestoResponse repuesto = await client.GetRepuestoAsync(new Id{ Id_ = id });
+            return Ok(repuesto);
         }
 
         [HttpPut("{id}")]
