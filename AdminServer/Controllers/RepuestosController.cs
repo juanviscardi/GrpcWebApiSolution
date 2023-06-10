@@ -23,7 +23,7 @@ namespace AdminServer.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> PostRepuesto(RepuestoDTO repuesto)
+        public async Task<ActionResult> PostRepuesto(RepuestoRequest repuesto)
         {
             using var channel = GrpcChannel.ForAddress(grpcURL);
             Repuesto.RepuestoClient client = new Repuesto.RepuestoClient(channel);
@@ -50,7 +50,7 @@ namespace AdminServer.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> PutRepuesto([FromRoute] Id id, RepuestoDTO repuesto)
+        public async Task<ActionResult> PutRepuesto([FromRoute] Id id, RepuestoRequest repuesto)
         {
             using var channel = GrpcChannel.ForAddress(grpcURL);
             Repuesto.RepuestoClient client = new Repuesto.RepuestoClient(channel);
@@ -58,13 +58,14 @@ namespace AdminServer.Controllers
             return Ok(reply.Message);
         }
 
-        //[HttpGet]
-        //public async Task<ActionResult> GetRepuestos()
-        //{
-        //    using var channel = GrpcChannel.ForAddress(grpcURL);
-        //    Admin.AdminClient client = new Admin.AdminClient(channel);
-        //    var reply = await client.GetRepuestosAsync();
-        //    return Ok(reply.Message);
-        //}
+        [HttpGet]
+        public async Task<ActionResult> GetRepuestos()
+        {
+            using var channel = GrpcChannel.ForAddress(grpcURL);
+            Repuesto.RepuestoClient client = new Repuesto.RepuestoClient(channel);
+            var request = new Empty();
+            var reply = await client.GetRepuestosAsync(request);
+            return Ok(reply.Repuestos);
+        }
     }
 }

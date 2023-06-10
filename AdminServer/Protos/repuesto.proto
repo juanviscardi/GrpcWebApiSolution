@@ -4,20 +4,30 @@ option csharp_namespace = "AdminServer";
 
 package repuesto;
 
-// The admin service definition.
 service Repuesto {
 
-  // Functions availables
-  rpc PostRepuesto(RepuestoDTO) returns (MessageReply);
+  rpc PostRepuesto(RepuestoRequest) returns (MessageReply);
   rpc GetRepuesto(Id) returns (MessageReply);
-  rpc PutRepuesto(RepuestoDTO) returns (MessageReply);
+  rpc PutRepuesto(RepuestoRequest) returns (MessageReply);
   rpc DeleteRepuesto(Id) returns (MessageReply);
+  rpc GetRepuestos(Empty) returns (ListRepuestos);
 }
 
- message RepuestoDTO {
+message RepuestoRequest {
 	string name = 1;
 	string proveedor = 2;
 	string marca = 3;
+}
+
+message RepuestoResponse {
+	string id = 1;
+	string name = 2;
+	string proveedor = 3;
+	string marca = 4;
+}
+
+message ListRepuestos {
+    repeated RepuestoResponse repuestos = 1;
 }
 
 message MessageReply {
@@ -26,4 +36,7 @@ message MessageReply {
 
 message Id {
 	int32 id = 1;
+}
+
+message Empty {
 }
