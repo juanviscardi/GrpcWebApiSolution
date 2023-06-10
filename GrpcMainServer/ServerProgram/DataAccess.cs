@@ -1,10 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using Common;
+using System.Collections.Generic;
 
 namespace GrpcMainServer.ServerProgram
 {
     public class DataAccess
     {
-        public List<User> Users { get; private set; }
+        public List<Usuario> usuarios { get; set; }
+        public List<string> categorias { get; set; }
+        public List<Common.Repuesto> repuestos { get; set; }
+        public List<Mensaje> mensajes { get; set; }
         private static DataAccess instance;
         private static readonly object singletonlock = new object();
         private int userId;
@@ -15,26 +19,31 @@ namespace GrpcMainServer.ServerProgram
             {
 
                 if (instance == null)
+                {
                     instance = new DataAccess();
-                    instance.Users = new List<User>();
+                    instance.usuarios = new List<Usuario>();
+                    instance.categorias = new List<string>();
+                    instance.repuestos = new List<Common.Repuesto>();
+                    instance.mensajes = new List<Mensaje>();
+                }
             }
             return instance;
         }
 
-        public int NextUserID
-        {
-            get
-            {
-                int res = userId;
-                userId++;
-                return res;
+        //public int NextUserID
+        //{
+        //    get
+        //    {
+        //        int res = userId;
+        //        userId++;
+        //        return res;
 
-            }
-            private set
-            {
-                userId = value;
-            }
-        }
+        //    }
+        //    private set
+        //    {
+        //        userId = value;
+        //    }
+        //}
 
     }
 }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Common;
 using Common.Interfaces;
 using GrpcMainServer;
+using GrpcMainServer.ServerProgram;
 using Microsoft.AspNetCore.Hosting.Server;
 using Repuesto = Common.Repuesto;
 
@@ -18,15 +19,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
         public bool acceptingConnections;
         private readonly TcpListener tcpListener;
         static readonly SettingsManager settingsMng = new SettingsManager();
-        static List<Usuario> usuarios = new List<Usuario>();
-        static List<Repuesto> repuestos = new List<Repuesto>();
-        static List<string> categorias = new List<string>();
-        static List<Mensaje> mensajes = new List<Mensaje>();
-
-        private static readonly SemaphoreSlim _agregarUsuario = new SemaphoreSlim(initialCount: 1, maxCount: 1);
-        private static readonly SemaphoreSlim _agregarRepuesto = new SemaphoreSlim(initialCount: 1, maxCount: 1);
-        private static readonly SemaphoreSlim _agregarCategoria = new SemaphoreSlim(initialCount: 1, maxCount: 1);
-        private static readonly SemaphoreSlim _asociarCategoria = new SemaphoreSlim(initialCount: 1, maxCount: 1);
+        static readonly BusinessLogic session = BusinessLogic.GetInstance();
 
 
         public Server(string serverIpAddress, string serverPort)
@@ -61,11 +54,6 @@ namespace GrpcSGrpcMainServer.ServerProgram
             }
 
 
-        }
-
-        private static List<Repuesto> GetRepuestos()
-        {
-            return repuestos;
         }
 
         private static async Task HandleClient(TcpClient tcpClientSocket)
@@ -104,7 +92,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                         else
                         {
                             bool existeYEsValido = false;
-                            usuarios.ToList().ForEach(x =>
+                            session.GetUsuarios().ToList().ForEach(x =>
                             {
                                 if (string.Equals(x.userName, usuario) && string.Equals(x.userPassword, pass))
                                 {
@@ -142,29 +130,30 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         string[] altaUsuarioRequestConTodo = altaUsuarioRequest.Split(ProtocolSpecification.fieldsSeparator);
                                         var userName = altaUsuarioRequestConTodo[0];
                                         var userPassword = altaUsuarioRequestConTodo[1];
+                                        string respuestaCreateUserAsync = await session.CreateUserAsync(userName, userPassword);
+                                        await networkdatahelper.Send(respuestaCreateUserAsync);
+                                        //Usuario user = new Usuario(
+                                        //                   userName,
+                                        //                   userPassword,
+                                        //                   "mecanico");
 
-                                        Usuario user = new Usuario(
-                                                           userName,
-                                                           userPassword,
-                                                           "mecanico");
 
+                                        //await _agregarUsuario.WaitAsync();
 
-                                        await _agregarUsuario.WaitAsync();
+                                        //if (!session.GetUsuarios().Contains(user))
+                                        //{
+                                        //    session.GetUsuarios().Add(user);
+                                        //    await networkdatahelper.Send("exito");
+                                        //    Console.WriteLine("Se Creo un nuevo usuario");
+                                        //    Console.WriteLine(user.ToString());
+                                        //    Console.WriteLine();
+                                        //}
+                                        //else
+                                        //{
+                                        //    await networkdatahelper.Send("el usuario ya existe");
+                                        //}
 
-                                        if (!usuarios.Contains(user))
-                                        {
-                                            usuarios.Add(user);
-                                            await networkdatahelper.Send("exito");
-                                            Console.WriteLine("Se Creo un nuevo usuario");
-                                            Console.WriteLine(user.ToString());
-                                            Console.WriteLine();
-                                        }
-                                        else
-                                        {
-                                            await networkdatahelper.Send("el usuario ya existe");
-                                        }
-
-                                        _agregarUsuario.Release();
+                                        //_agregarUsuario.Release();
 
                                         break;
                                     case "2":
@@ -188,23 +177,25 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         var repuestoName = altaRepuestoRequestConTodo[0];
                                         var repuestoProveedor = altaRepuestoRequestConTodo[1];
                                         var repuestoMarca = altaRepuestoRequestConTodo[2];
-                                        Repuesto repu = new Repuesto(
-                                                           GetRepuestos().Count().ToString(),
-                                                           repuestoName,
-                                                           repuestoProveedor,
-                                                           repuestoMarca);
-                                        await _agregarRepuesto.WaitAsync();
+                                        //Repuesto repu = new Repuesto(
+                                        //                   session.GetRepuestos().Count().ToString(),
+                                        //                   repuestoName,
+                                        //                   repuestoProveedor,
+                                        //                   repuestoMarca);
+                                        //await _agregarRepuesto.WaitAsync();
 
-                                        if (!GetRepuestos().Contains(repu))
-                                        {
-                                            GetRepuestos().Add(repu);
-                                            await networkdatahelper.Send("exito");
-                                        }
-                                        else
-                                        {
-                                            await networkdatahelper.Send("el repuesto ya existe");
-                                        }
-                                        _agregarRepuesto.Release();
+                                        //if (!session.GetRepuestos().Contains(repu))
+                                        //{
+                                        //    session.GetRepuestos().Add(repu);
+                                        //    await networkdatahelper.Send("exito");
+                                        //}
+                                        //else
+                                        //{
+                                        //    await networkdatahelper.Send("el repuesto ya existe");
+                                        //}
+                                        //_agregarRepuesto.Release();
+                                        string respuestaCreateRepuestoAsync = await session.CreateRepuestoAsync(repuestoName, repuestoProveedor, repuestoMarca);
+                                        await networkdatahelper.Send(respuestaCreateRepuestoAsync);
                                         break;
 
 
@@ -213,19 +204,20 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         // SRF3.Crear Categoría de repuesto. El sistema debe permitir crear una categoría para los repuestos.
                                         // CRF3. Alta de Categoría de repuesto. El sistema debe permitir crear una Categoría para los repuestos.
                                         string categoria = await networkdatahelper.Receive();
-                                        await _agregarCategoria.WaitAsync();
+                                        //await _agregarCategoria.WaitAsync();
 
-                                        if (!categorias.Contains(categoria))
-                                        {
-                                            categorias.Add(categoria);
-                                            await networkdatahelper.Send("exito");
-                                        }
-                                        else
-                                        {
-                                            await networkdatahelper.Send("la categoria ya existe");
-                                        }
-                                        _agregarCategoria.Release();
-
+                                        //if (!session.GetCategorias().Contains(categoria))
+                                        //{
+                                        //    session.GetCategorias().Add(categoria);
+                                        //    await networkdatahelper.Send("exito");
+                                        //}
+                                        //else
+                                        //{
+                                        //    await networkdatahelper.Send("la categoria ya existe");
+                                        //}
+                                        //_agregarCategoria.Release();
+                                        string respuestaCreateCategoriaAsync = await session.CreateCategoriaAsync(categoria);
+                                        await networkdatahelper.Send(respuestaCreateCategoriaAsync);
                                         break;
                                     case "3":
                                         //SRF4. Asociar Categorías a un repuesto. El sistema debe permitir asociar categorías a los repuestos.
@@ -233,14 +225,14 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         // Console.WriteLine("3 - Asociar Categorías a los repuestos");
                                         // envio nombre de repuestos existentes para que se listen en el cliente
                                         List<string> repuestosExistentesNamesResponse = new List<string>();
-                                        GetRepuestos().ToList().ForEach(x =>
+                                        session.GetRepuestos().ToList().ForEach(x =>
                                         {
                                             repuestosExistentesNamesResponse.Add(x.Name);
                                         });
                                         await networkdatahelper.Send(string.Join(ProtocolSpecification.fieldsSeparator, repuestosExistentesNamesResponse));
                                         // envio nombre de categorias existentes para que se listen en el cliente
-                                        await networkdatahelper.Send(string.Join(ProtocolSpecification.fieldsSeparator, categorias));
-                                        // recivo el nombre del repuesto elegio y la categoria elegida
+                                        await networkdatahelper.Send(string.Join(ProtocolSpecification.fieldsSeparator, session.GetCategorias()));
+                                        // recibo el nombre del repuesto elegio y la categoria elegida
                                         string asociarCategoriaRequest = await networkdatahelper.Receive();
                                         if (string.Equals(asociarCategoriaRequest, "exit"))
                                         {
@@ -249,32 +241,34 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         string[] asociarCategoriaRequestConTodo = asociarCategoriaRequest.Split(ProtocolSpecification.fieldsSeparator);
                                         string repuestoName4 = asociarCategoriaRequestConTodo[0];
                                         string categoria4 = asociarCategoriaRequestConTodo[1];
-                                        await _asociarCategoria.WaitAsync();
+                                        string respuestaAsociarCategoriaAsync = await session.AsociarCategoriaAsync(repuestoName4, categoria4);
+                                        await networkdatahelper.Send(respuestaAsociarCategoriaAsync);
+                                        //await _asociarCategoria.WaitAsync();
 
-                                        var repuesto4 = GetRepuestos().Find(x => string.Equals(repuestoName4, x.Name));
-                                        if (repuesto4 != null)
-                                        {
-                                            if (!repuesto4.Categorias.Contains(categoria4)) // Verifica si la categoría ya está presente en el Repuesto
-                                            {
-                                                if (!categorias.Contains(categoria4))
-                                                {
-                                                    await networkdatahelper.Send("La categoría no existe");
-                                                    break;
-                                                }
-                                                repuesto4.Categorias.Add(categoria4); // Agrega la nueva categoría al Repuesto
-                                                await networkdatahelper.Send("exito");
-                                            }
-                                            else
-                                            {
-                                                await networkdatahelper.Send("La categoría ya está presente en el Repuesto.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            await networkdatahelper.Send("El repuesto no existe.");
-                                        }
+                                        //var repuesto4 = session.GetRepuestos().Find(x => string.Equals(repuestoName4, x.Name));
+                                        //if (repuesto4 != null)
+                                        //{
+                                        //    if (!repuesto4.Categorias.Contains(categoria4)) // Verifica si la categoría ya está presente en el Repuesto
+                                        //    {
+                                        //        if (!session.GetCategorias().Contains(categoria4))
+                                        //        {
+                                        //            await networkdatahelper.Send("La categoría no existe");
+                                        //            break;
+                                        //        }
+                                        //        repuesto4.Categorias.Add(categoria4); // Agrega la nueva categoría al Repuesto
+                                        //        await networkdatahelper.Send("exito");
+                                        //    }
+                                        //    else
+                                        //    {
+                                        //        await networkdatahelper.Send("La categoría ya está presente en el Repuesto.");
+                                        //    }
+                                        //}
+                                        //else
+                                        //{
+                                        //    await networkdatahelper.Send("El repuesto no existe.");
+                                        //}
 
-                                        _asociarCategoria.Release();
+                                        //_asociarCategoria.Release();
 
                                         break;
                                     case "4":
@@ -282,7 +276,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         //CRF5. Asociar foto a repuesto. El sistema debe permitir subir una foto y asociarla a un repuesto específico.
 
                                         List<string> repuestosExistentesParaFotoResponse = new List<string>();
-                                        GetRepuestos().ToList().ForEach(x =>
+                                        session.GetRepuestos().ToList().ForEach(x =>
                                         {
                                             repuestosExistentesParaFotoResponse.Add(x.Name);
                                         });
@@ -292,7 +286,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         {
                                             break;
                                         }
-                                        var repuesto5 = GetRepuestos().Find(x => string.Equals(nombreRepuestoOExit, x.Name));
+                                        var repuesto5 = session.GetRepuestos().Find(x => string.Equals(nombreRepuestoOExit, x.Name));
                                         if (repuesto5 != null)
                                         {
                                             await networkdatahelper.Send("El repuesto existe.");
@@ -319,7 +313,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         {
                                             case "1":
                                                 // Console.WriteLine("1 - Listar todos");
-                                                GetRepuestos().ToList().ForEach(x =>
+                                                session.GetRepuestos().ToList().ForEach(x =>
                                                 {
                                                     repuestosExistentesResponse.Add(x.ToStringListar());
                                                 });
@@ -328,7 +322,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                             case "2":
                                                 // Console.WriteLine("2 - Buscar por nombre repuesto");
                                                 string opcionListadoNombre = await networkdatahelper.Receive();
-                                                GetRepuestos().ToList().ForEach(x =>
+                                                session.GetRepuestos().ToList().ForEach(x =>
                                                 {
                                                     if (string.Equals(x.Name, opcionListadoNombre))
                                                     {
@@ -340,7 +334,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                             case "3":
                                                 // Console.WriteLine("3 - Buscar por categoria");
                                                 string opcionListadoCategoria = await networkdatahelper.Receive();
-                                                GetRepuestos().ToList().ForEach(x =>
+                                                session.GetRepuestos().ToList().ForEach(x =>
                                                 {
                                                     if (x.Categorias.Contains(opcionListadoCategoria))
                                                     {
@@ -352,7 +346,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                             case "4":
                                                 // Console.WriteLine("4 - Buscar por nombre archivo foto");
                                                 string opcionListadoFoto = await networkdatahelper.Receive();
-                                                GetRepuestos().ToList().ForEach(x =>
+                                                session.GetRepuestos().ToList().ForEach(x =>
                                                 {
                                                     if (string.Equals(x.Foto, opcionListadoFoto))
                                                     {
@@ -364,7 +358,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                             case "5":
                                                 // Console.WriteLine("5 - Buscar por nombre de proveedor");
                                                 string opcionListadoProveedor = await networkdatahelper.Receive();
-                                                GetRepuestos().ToList().ForEach(x =>
+                                                session.GetRepuestos().ToList().ForEach(x =>
                                                 {
                                                     if (string.Equals(x.Proveedor, opcionListadoProveedor))
                                                     {
@@ -376,7 +370,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                             case "6":
                                                 // Console.WriteLine("6 - Buscar por nombre de marca")
                                                 string opcionListadoMarca = await networkdatahelper.Receive();
-                                                GetRepuestos().ToList().ForEach(x =>
+                                                session.GetRepuestos().ToList().ForEach(x =>
                                                 {
                                                     if (string.Equals(x.Marca, opcionListadoMarca))
                                                     {
@@ -395,7 +389,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         // específico.También deberá ser capaz de descargar la imagen asociada, en caso de existir la misma.
 
                                         List<string> nombreRepuestosExistentes = new List<string>();
-                                        GetRepuestos().ToList().ForEach(x =>
+                                        session.GetRepuestos().ToList().ForEach(x =>
                                         {
                                             nombreRepuestosExistentes.Add(x.Name);
                                         });
@@ -405,7 +399,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         {
                                             break;
                                         }
-                                        var repuesto6 = GetRepuestos().Find(x => string.Equals(nombreRepuestoQuieroDetalles, x.Name));
+                                        var repuesto6 = session.GetRepuestos().Find(x => string.Equals(nombreRepuestoQuieroDetalles, x.Name));
                                         if (repuesto6 != null)
                                         {
                                             bool tieneFoto = true;
@@ -433,7 +427,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
 
                                         // mandar todos los mecanicos
                                         List<string> nombreMecanicos = new List<string>();
-                                        usuarios.ToList().ForEach(x =>
+                                        session.GetUsuarios().ToList().ForEach(x =>
                                         {
                                             nombreMecanicos.Add(x.userName);
                                         });
@@ -447,7 +441,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                             await networkdatahelper.Send("No se puede enviar un mensaje a si mismo");
                                             break;
                                         }
-                                        var usuarioDestintario = usuarios.Find(x => string.Equals(mensajeEnviado.destinatario, x.userName));
+                                        var usuarioDestintario = session.GetUsuarios().Find(x => string.Equals(mensajeEnviado.destinatario, x.userName));
                                         if (usuarioDestintario == null)
                                         {
                                             await networkdatahelper.Send("El destinatario no es un mecanica valido.");
@@ -459,7 +453,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                             break;
                                         }
                                         // enviar respuesta a imprimir en el cliente
-                                        mensajes.Add(mensajeEnviado);
+                                        session.GetMensajes().Add(mensajeEnviado);
                                         mensajeEnviado.ImprimirServer();
                                         await networkdatahelper.Send("Mensaje enviado. ");
                                         // CRF8.Enviar y recibir mensajes. El sistema debe permitir que un mecánico envíe mensajes
@@ -480,12 +474,12 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         List<Mensaje> mensajesNuevos;
                                         if (string.Equals(opcionElegidoLeer, "1"))
                                         {
-                                            mensajesNuevos = mensajes.FindAll(x => string.Equals(x.destinatario, usernameConnected) && !x.visto);
+                                            mensajesNuevos = session.GetMensajes().FindAll(x => string.Equals(x.destinatario, usernameConnected) && !x.visto);
                                             await networkdatahelper.Send(string.Join(ProtocolSpecification.fieldsSeparator, mensajesNuevos));
                                         }
                                         else
                                         {
-                                            mensajesNuevos = mensajes.FindAll(x => string.Equals(x.destinatario, usernameConnected));
+                                            mensajesNuevos = session.GetMensajes().FindAll(x => string.Equals(x.destinatario, usernameConnected));
                                             await networkdatahelper.Send(string.Join(ProtocolSpecification.fieldsSeparator, mensajesNuevos));
                                         }
                                         mensajesNuevos.ForEach(x => x.visto = true);

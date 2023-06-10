@@ -15,10 +15,9 @@ service Repuesto {
 }
 
  message RepuestoDTO {
-	string id = 1;
-	string name = 2;
-	string proveedor = 3;
-	string marca = 4;
+	string name = 1;
+	string proveedor = 2;
+	string marca = 3;
 }
 
 message MessageReply {

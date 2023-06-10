@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 namespace GrpcMainServer { 
     public class RepuestoService : Repuesto.RepuestoBase
     {
-        public override Task<MessageReply> PostRepuesto(RepuestoDTO request, ServerCallContext context)
+        public override async Task<MessageReply> PostRepuesto(RepuestoDTO request, ServerCallContext context)
         {
-            //BusinessLogic session = BusinessLogic.GetInstance();
+            BusinessLogic session = BusinessLogic.GetInstance();
             //Console.WriteLine("Antes de crear el usuario con nombre {0}",request.Name);
-            //string message = session.CreateUser(request.Name);
-            return Task.FromResult(new MessageReply { Message = "test post" });
+            string message = await session.CreateRepuestoAsync(request.Name, request.Proveedor, request.Marca);
+            return new MessageReply { Message = message };
         }
 
         public override Task<MessageReply> GetRepuesto(Id request, ServerCallContext context)
