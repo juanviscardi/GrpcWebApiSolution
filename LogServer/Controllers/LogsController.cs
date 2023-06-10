@@ -18,8 +18,8 @@ namespace LogServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Log>>> GetLogs()
         {
-            Log mockLog1 = new Log("Creado con exito", Action.Create);
-            Log mockLog2 = new Log("Creado con exito", Action.Create);
+            Log mockLog1 = new Log("Creado con exito", Action.Create, "Pedrito");
+            Log mockLog2 = new Log("Creado con exito", Action.Create, "Martin");
             List<Log> logs = new List<Log>();
             logs.Add(mockLog1);
             logs.Add(mockLog2);
