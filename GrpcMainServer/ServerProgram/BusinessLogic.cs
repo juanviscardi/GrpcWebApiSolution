@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using static GrpcMainServer.Repuesto;
+using RabbitMQ.Client;
+using System.Text;
 
 namespace GrpcMainServer.ServerProgram
 {
@@ -9,6 +11,7 @@ namespace GrpcMainServer.ServerProgram
     {
         private static BusinessLogic instance;
         private DataAccess da;
+        private IModel channel;
         private static readonly object singletonlock = new object();
         private static readonly SemaphoreSlim _agregarUsuario = new SemaphoreSlim(initialCount: 1, maxCount: 1);
         private static readonly SemaphoreSlim _agregarRepuesto = new SemaphoreSlim(initialCount: 1, maxCount: 1);
@@ -23,6 +26,14 @@ namespace GrpcMainServer.ServerProgram
                 {
                     instance = new BusinessLogic();
                     instance.da = DataAccess.GetInstance();
+                    var factory = new ConnectionFactory() { HostName = "localhost" };
+                    var connection = factory.CreateConnection();
+                    instance.channel = connection.CreateModel();
+                    instance.channel.QueueDeclare(queue: "logs",
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: null);
                 }
             }
             return instance;
@@ -103,7 +114,7 @@ namespace GrpcMainServer.ServerProgram
         internal async Task<string> DeleteRepuestoAsync(string id)
         {
             Common.Repuesto respuestoAEliminar = this.GetRepuestoById(id);
-            if(respuestoAEliminar == null)
+            if (respuestoAEliminar == null)
             {
                 return "No existe";
             }
@@ -123,7 +134,7 @@ namespace GrpcMainServer.ServerProgram
             await _asociarCategoria.WaitAsync();
             da.repuestos.ForEach(x =>
             {
-                if(x.Id ==  repuestoDTO.Id)
+                if (x.Id == repuestoDTO.Id)
                 {
                     x.Name = repuestoDTO.Name;
                     x.Proveedor = repuestoDTO.Proveedor;
@@ -202,6 +213,18 @@ namespace GrpcMainServer.ServerProgram
             });
             _asociarCategoria.Release();
             return "Modificado";
+        }
+
+        internal async Task CreateLog(string mensaje, Action action, string userName, Status status = Status.Ok)
+        {
+            Log newLog = new Log(mensaje, action, userName, status);
+            var body = Encoding.UTF8.GetBytes(newLog.ToString());
+            var properties = channel.CreateBasicProperties();
+            properties.Persistent = true;
+            channel.BasicPublish(exchange: "",
+                routingKey: "task_queue",
+                basicProperties: properties,
+                body: body);
         }
     }
 }

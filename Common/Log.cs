@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 public enum Action
 {
@@ -38,6 +40,15 @@ namespace Common
         }
 
         public override string ToString()
+        {
+            return this.Date.ToString() + ProtocolSpecification.fieldsSeparator +
+                    this.Action + ProtocolSpecification.fieldsSeparator +
+                    this.Status + ProtocolSpecification.fieldsSeparator +
+                    this.UserName + ProtocolSpecification.fieldsSeparator +
+                    this.Mensaje;
+        }
+
+        public string ToStringListar()
         {
             return "Fecha: " + this.Date.ToString() +
                     "; Action: " + (Action)this.Action +
