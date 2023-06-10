@@ -11,6 +11,7 @@ service Repuesto {
   rpc PutRepuesto(RepuestoDTO) returns (MessageReply);
   rpc DeleteRepuesto(Id) returns (MessageReply);
   rpc GetRepuestos(Empty) returns (ListRepuestos);
+  rpc PatchRepuesto(Id) returns (MessageReply);
 }
 
 message RepuestoRequest {

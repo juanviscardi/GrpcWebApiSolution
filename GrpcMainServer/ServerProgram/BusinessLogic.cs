@@ -184,5 +184,24 @@ namespace GrpcMainServer.ServerProgram
             _asociarCategoria.Release();
             return respuesta;
         }
+
+        internal async Task<string> PatchRepuestoAsync(string id)
+        {
+            Common.Repuesto respuestoAModificar = this.GetRepuestoById(id);
+            if (respuestoAModificar == null)
+            {
+                return "No existe";
+            }
+            await _asociarCategoria.WaitAsync();
+            da.repuestos.ForEach(x =>
+            {
+                if (x.Id == id)
+                {
+                    x.Foto = "";
+                }
+            });
+            _asociarCategoria.Release();
+            return "Modificado";
+        }
     }
 }

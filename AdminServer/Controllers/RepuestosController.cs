@@ -92,5 +92,18 @@ namespace AdminServer.Controllers
             var reply = await client.GetRepuestosAsync(request);
             return Ok(reply.Repuestos);
         }
+
+        [HttpPatch("{id}")]
+        public async Task<ActionResult> EliminarFoto(int id)
+        {
+            using var channel = GrpcChannel.ForAddress(grpcURL);
+            Repuesto.RepuestoClient client = new Repuesto.RepuestoClient(channel);
+            var reply = await client.PatchRepuestoAsync(new Id { Id_ = id });
+            if (reply.Message == "No existe")
+            {
+                return NotFound();
+            }
+            return Ok(reply.Message);
+        }
     }
 }

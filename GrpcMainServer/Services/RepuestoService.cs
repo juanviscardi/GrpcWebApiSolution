@@ -71,5 +71,12 @@ namespace GrpcMainServer {
             return Task.FromResult(response);
         }
 
+        public override async Task<MessageReply> PatchRepuesto(Id request, ServerCallContext context)
+        {
+            BusinessLogic session = BusinessLogic.GetInstance();
+            string repuesta = await session.PatchRepuestoAsync(request.Id_.ToString());
+            return new MessageReply { Message = repuesta };
+        }
+
     }
 }
