@@ -64,11 +64,22 @@ namespace AdminServer.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> PutRepuesto([FromRoute] Id id, RepuestoRequest repuesto)
+        public async Task<ActionResult> PutRepuesto(int id, RepuestoRequest repuestoRequest)
         {
             using var channel = GrpcChannel.ForAddress(grpcURL);
             Repuesto.RepuestoClient client = new Repuesto.RepuestoClient(channel);
+            RepuestoDTO repuesto = new RepuestoDTO
+            {
+                Id = id.ToString(),
+                Name = repuestoRequest.Name,
+                Proveedor = repuestoRequest.Proveedor,
+                Marca = repuestoRequest.Marca
+            };
             var reply = await client.PutRepuestoAsync(repuesto);
+            if(reply.Message == "No existe")
+            {
+                return NotFound();
+            }
             return Ok(reply.Message);
         }
 

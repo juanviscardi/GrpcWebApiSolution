@@ -8,7 +8,7 @@ service Repuesto {
 
   rpc PostRepuesto(RepuestoRequest) returns (MessageReply);
   rpc GetRepuesto(Id) returns (RepuestoResponse);
-  rpc PutRepuesto(RepuestoRequest) returns (MessageReply);
+  rpc PutRepuesto(RepuestoDTO) returns (MessageReply);
   rpc DeleteRepuesto(Id) returns (MessageReply);
   rpc GetRepuestos(Empty) returns (ListRepuestos);
 }

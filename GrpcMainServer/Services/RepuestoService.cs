@@ -40,12 +40,11 @@ namespace GrpcMainServer {
             return Task.FromResult(repuestoResponse);
         }
 
-        public override Task<MessageReply> PutRepuesto(RepuestoRequest request, ServerCallContext context)
+        public override async Task<MessageReply> PutRepuesto(RepuestoDTO request, ServerCallContext context)
         {
-            //BusinessLogic session = BusinessLogic.GetInstance();
-            //Console.WriteLine("Antes de crear el usuario con nombre {0}", request.Name);
-            //string message = session.CreateUser(request.Name);
-            return Task.FromResult(new MessageReply { Message = "test put" });
+            BusinessLogic session = BusinessLogic.GetInstance();
+            string repuesta = await session.PutRepuestoAsync(request);
+            return new MessageReply { Message = repuesta };
         }
 
         public override async Task<MessageReply> DeleteRepuesto(Id request, ServerCallContext context)

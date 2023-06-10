@@ -113,6 +113,27 @@ namespace GrpcMainServer.ServerProgram
             return "Eliminado";
         }
 
+        internal async Task<string> PutRepuestoAsync(RepuestoDTO repuestoDTO)
+        {
+            Common.Repuesto respuestoAModificar = this.GetRepuestoById(repuestoDTO.Id);
+            if (respuestoAModificar == null)
+            {
+                return "No existe";
+            }
+            await _asociarCategoria.WaitAsync();
+            da.repuestos.ForEach(x =>
+            {
+                if(x.Id ==  repuestoDTO.Id)
+                {
+                    x.Name = repuestoDTO.Name;
+                    x.Proveedor = repuestoDTO.Proveedor;
+                    x.Marca = repuestoDTO.Marca;
+                }
+            });
+            _asociarCategoria.Release();
+            return "Modificado";
+        }
+
         internal async Task<string> CreateCategoriaAsync(string categoria)
         {
             string respuesta = "";
