@@ -39,6 +39,28 @@ namespace Common
             this.UserName = userName;
         }
 
+        public Log(string message)
+        {
+            List<string> partes = message.Split(ProtocolSpecification.fieldsSeparator).ToList();
+            if (partes.Count >= 5)
+            {
+                DateTime date;
+                if (DateTime.TryParse(partes[0], out date))
+                    this.Date = date;
+
+                Action action;
+                if (Enum.TryParse(partes[1], out action))
+                    this.Action = action;
+
+                Status status;
+                if (Enum.TryParse(partes[2], out status))
+                    this.Status = status;
+
+                this.UserName = partes[3];
+                this.Mensaje = partes[4];
+            }
+        }
+
         public override string ToString()
         {
             return this.Date.ToString() + ProtocolSpecification.fieldsSeparator +
