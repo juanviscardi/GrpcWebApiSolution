@@ -26,7 +26,16 @@ namespace GrpcMainServer.ServerProgram
                 {
                     instance = new BusinessLogic();
                     instance.da = DataAccess.GetInstance();
-                    var factory = new ConnectionFactory() { HostName = "localhost" };
+                    var factory = new ConnectionFactory()
+                     {
+                         HostName = "localhost", // Dirección del servidor RabbitMQ
+                         Port = 5672, // Puerto del servidor RabbitMQ
+                         UserName = "guest", // Nombre de usuario
+                         Password = "guest", // Contraseña
+                         VirtualHost = "/", // Virtual host (por defecto: "/")
+                         RequestedConnectionTimeout = TimeSpan.FromSeconds(10), // Tiempo de espera para la conexión
+                         RequestedHeartbeat = TimeSpan.FromSeconds(10), // Intervalo de latido del corazón
+                     };
                     var connection = factory.CreateConnection();
                     instance.channel = connection.CreateModel();
                     instance.channel.QueueDeclare(queue: "logs",
@@ -223,7 +232,7 @@ namespace GrpcMainServer.ServerProgram
             var properties = channel.CreateBasicProperties();
             properties.Persistent = true;
             channel.BasicPublish(exchange: "",
-                routingKey: "task_queue",
+                routingKey: "logs",
                 basicProperties: properties,
                 body: body);
         }

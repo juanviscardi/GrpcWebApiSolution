@@ -43,8 +43,17 @@ namespace LogServer
 
         private static void Receiver()
         {
-            var factory = new ConnectionFactory() { HostName = "localhost" };
-            BusinessLogic businessLogic = new BusinessLogic();
+            var factory = new ConnectionFactory()
+            {
+                HostName = "localhost", // Dirección del servidor RabbitMQ
+                Port = 5672, // Puerto del servidor RabbitMQ
+                UserName = "guest", // Nombre de usuario
+                Password = "guest", // Contraseña
+                VirtualHost = "/", // Virtual host (por defecto: "/")
+                RequestedConnectionTimeout = TimeSpan.FromSeconds(10), // Tiempo de espera para la conexión
+                RequestedHeartbeat = TimeSpan.FromSeconds(10), // Intervalo de latido del corazón
+            };
+            BusinessLogic businessLogic = BusinessLogic.GetInstance();
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
@@ -67,16 +76,13 @@ namespace LogServer
                     Console.WriteLine(" [x] Received {0}", message);
                     businessLogic.AddLog(message);
                     Console.WriteLine(" [x] Done");
-                    channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                    //channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
                 };
 
                 channel.BasicConsume(queue: "logs",
                     autoAck: false,
                     consumer: consumer);
-                while (true)
-                {
-                    Thread.Sleep(1000);
-                }
+                Console.ReadLine();
             }
         }
     }
