@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using static GrpcMainServer.Repuesto;
 using RabbitMQ.Client;
 using System.Text;
+using System.Xml.Linq;
 
 namespace GrpcMainServer.ServerProgram
 {
@@ -82,19 +83,19 @@ namespace GrpcMainServer.ServerProgram
             {
                 this.GetUsuarios().Add(user);
                 respuesta = "exito";
-                _ = CreateLog($"Se ha creado el usuario {name}", Action.Create, "admin");
+                CreateLog($"Se ha creado el usuario {name}", Action.Create, "admin");
             }
             else
             {
                 respuesta = "el usuario ya existe";
-                _ = CreateLog($"El usuario {name} ya existe", Action.Create, "admin", Status.Error);
+                CreateLog($"El usuario {name} ya existe", Action.Create, "admin", Status.Error);
             }
 
             _agregarUsuario.Release();
             return respuesta;
         }
 
-        internal async Task<string> CreateRepuestoAsync(string name, string proveedor, string marca)
+        internal async Task<string> CreateRepuestoAsync(string name, string proveedor, string marca, string userConnected)
         {
             string respuesta = "";
             Common.Repuesto repu = new Common.Repuesto(
@@ -107,10 +108,12 @@ namespace GrpcMainServer.ServerProgram
             if (!this.GetRepuestos().Contains(repu))
             {
                 this.GetRepuestos().Add(repu);
+                CreateLog($"Se ha creado el repuesto {name}", Action.Create, userConnected);
                 respuesta = "exito";
             }
             else
             {
+                CreateLog($"Ya existe un repuesto de nombre {name}", Action.Create, userConnected, Status.Error);
                 respuesta = "el repuesto ya existe";
             }
             _agregarRepuesto.Release();
@@ -122,10 +125,12 @@ namespace GrpcMainServer.ServerProgram
             Common.Repuesto respuestoAEliminar = this.GetRepuestoById(id);
             if (respuestoAEliminar == null)
             {
+                CreateLog($"El repuesto con Id {id} no existe", Action.Delete, "web_api", Status.Error);
                 return "No existe";
             }
             await _asociarCategoria.WaitAsync();
             da.repuestos.Remove(respuestoAEliminar);
+            CreateLog($"Se ha eliminado el repuesto con Id {id}", Action.Delete, "web_api");
             _asociarCategoria.Release();
             return "Eliminado";
         }
@@ -135,6 +140,7 @@ namespace GrpcMainServer.ServerProgram
             Common.Repuesto respuestoAModificar = this.GetRepuestoById(repuestoDTO.Id);
             if (respuestoAModificar == null)
             {
+                CreateLog($"El repuesto con Id {repuestoDTO.Id} no existe", Action.Modify, "web_api", Status.Error);
                 return "No existe";
             }
             await _asociarCategoria.WaitAsync();
@@ -147,11 +153,12 @@ namespace GrpcMainServer.ServerProgram
                     x.Marca = repuestoDTO.Marca;
                 }
             });
+            CreateLog($"Se ha modificado el repuesto con Id {repuestoDTO.Id}", Action.Modify, "web_api");
             _asociarCategoria.Release();
             return "Modificado";
         }
 
-        internal async Task<string> CreateCategoriaAsync(string categoria)
+        internal async Task<string> CreateCategoriaAsync(string categoria, string userConnected)
         {
             string respuesta = "";
             await _agregarCategoria.WaitAsync();
@@ -159,17 +166,19 @@ namespace GrpcMainServer.ServerProgram
             if (!this.GetCategorias().Contains(categoria))
             {
                 this.GetCategorias().Add(categoria);
+                CreateLog($"Se ha creado la categoria {categoria}", Action.Create, userConnected);
                 respuesta = "exito";
             }
             else
             {
+                CreateLog($"Ya existe una categoria con el nombre {categoria}", Action.Create, userConnected, Status.Error);
                 respuesta = "la categoria ya existe";
             }
             _agregarCategoria.Release();
             return respuesta;
         }
 
-        internal async Task<string> AsociarCategoriaAsync(string respuestoName, string categoria)
+        internal async Task<string> AsociarCategoriaAsync(string respuestoName, string categoria, string userConnected)
         {
             string respuesta = "";
             await _asociarCategoria.WaitAsync();
@@ -181,20 +190,24 @@ namespace GrpcMainServer.ServerProgram
                 {
                     if (!this.GetCategorias().Contains(categoria))
                     {
+                        CreateLog($"La categoria {categoria} no existe", Action.Modify, userConnected, Status.Error);
                         respuesta = "La categoría no existe";
                         _asociarCategoria.Release();
                         return respuesta;
                     }
                     repuesto.Categorias.Add(categoria); // Agrega la nueva categoría al Repuesto
+                    CreateLog($"Se ha asociado la categoria {categoria} al repuesto {repuesto.Name}", Action.Modify, userConnected);
                     respuesta = "exito";
                 }
                 else
                 {
+                    CreateLog($"La categoria {categoria} ya esta presente en el Repuesto", Action.Modify, userConnected, Status.Error);
                     respuesta = "La categoría ya está presente en el Repuesto.";
                 }
             }
             else
             {
+                CreateLog($"El repuesto {respuestoName} no existe", Action.Modify, userConnected, Status.Error);
                 respuesta = "El repuesto no existe.";
             }
 
@@ -207,6 +220,7 @@ namespace GrpcMainServer.ServerProgram
             Common.Repuesto respuestoAModificar = this.GetRepuestoById(id);
             if (respuestoAModificar == null)
             {
+                CreateLog($"El repuesto de Id {id} no existe", Action.Modify, "web_api", Status.Error);
                 return "No existe";
             }
             await _asociarCategoria.WaitAsync();
@@ -217,6 +231,7 @@ namespace GrpcMainServer.ServerProgram
                     x.Foto = "";
                 }
             });
+            CreateLog($"Se ha eliminado la foto al repuesto de Id {id}", Action.Modify, "web_api");
             _asociarCategoria.Release();
             return "Modificado";
         }

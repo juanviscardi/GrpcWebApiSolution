@@ -13,7 +13,7 @@ namespace GrpcMainServer {
         {
             BusinessLogic session = BusinessLogic.GetInstance();
             //Console.WriteLine("Antes de crear el usuario con nombre {0}",request.Name);
-            string message = await session.CreateRepuestoAsync(request.Name, request.Proveedor, request.Marca);
+            string message = await session.CreateRepuestoAsync(request.Name, request.Proveedor, request.Marca, "web_api");
             return new MessageReply { Message = message };
         }
 

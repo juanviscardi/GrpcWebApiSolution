@@ -87,6 +87,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                             Console.WriteLine();
                             Console.WriteLine("Usuario: {0} hizo login como Administrador", usuario);
                             Console.WriteLine();
+                            session.CreateLog($"El usuario {usuario} hizo login como Administrador", Action.Retrive, usuario);
                             await networkdatahelper.Send("admin");
                         }
                         else
@@ -104,10 +105,12 @@ namespace GrpcSGrpcMainServer.ServerProgram
                             {
                                 userType = "mecanico";
                                 Console.WriteLine("Usuario: {0} hizo login como Mecanico", usuario);
+                                session.CreateLog($"El usuario {usuario} hizo login como Mecanico", Action.Retrive, usuario);
                                 await networkdatahelper.Send("mecanico");
                             }
                             else
                             {
+                                session.CreateLog($"El usuario {usuario} quiso ingresar con un usuario o password invalida", Action.Retrive, usuario);
                                 Console.WriteLine("Usuario: {0} no se conecto", usuario);
                                 await networkdatahelper.Send("error");
                             }
@@ -125,36 +128,12 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         //CRF1 Alta de usuario
                                         // Alta de usuario. Se debe poder dar de alta a un usuario (mecánico). 
                                         // Esta funcionalidad solo puede realizarse desde el usuario administrador.
-
                                         string altaUsuarioRequest = await networkdatahelper.Receive();
                                         string[] altaUsuarioRequestConTodo = altaUsuarioRequest.Split(ProtocolSpecification.fieldsSeparator);
                                         var userName = altaUsuarioRequestConTodo[0];
                                         var userPassword = altaUsuarioRequestConTodo[1];
                                         string respuestaCreateUserAsync = await session.CreateUserAsync(userName, userPassword);
                                         await networkdatahelper.Send(respuestaCreateUserAsync);
-                                        //Usuario user = new Usuario(
-                                        //                   userName,
-                                        //                   userPassword,
-                                        //                   "mecanico");
-
-
-                                        //await _agregarUsuario.WaitAsync();
-
-                                        //if (!session.GetUsuarios().Contains(user))
-                                        //{
-                                        //    session.GetUsuarios().Add(user);
-                                        //    await networkdatahelper.Send("exito");
-                                        //    Console.WriteLine("Se Creo un nuevo usuario");
-                                        //    Console.WriteLine(user.ToString());
-                                        //    Console.WriteLine();
-                                        //}
-                                        //else
-                                        //{
-                                        //    await networkdatahelper.Send("el usuario ya existe");
-                                        //}
-
-                                        //_agregarUsuario.Release();
-
                                         break;
                                     case "2":
                                         // Salir;
@@ -177,24 +156,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         var repuestoName = altaRepuestoRequestConTodo[0];
                                         var repuestoProveedor = altaRepuestoRequestConTodo[1];
                                         var repuestoMarca = altaRepuestoRequestConTodo[2];
-                                        //Repuesto repu = new Repuesto(
-                                        //                   session.GetRepuestos().Count().ToString(),
-                                        //                   repuestoName,
-                                        //                   repuestoProveedor,
-                                        //                   repuestoMarca);
-                                        //await _agregarRepuesto.WaitAsync();
-
-                                        //if (!session.GetRepuestos().Contains(repu))
-                                        //{
-                                        //    session.GetRepuestos().Add(repu);
-                                        //    await networkdatahelper.Send("exito");
-                                        //}
-                                        //else
-                                        //{
-                                        //    await networkdatahelper.Send("el repuesto ya existe");
-                                        //}
-                                        //_agregarRepuesto.Release();
-                                        string respuestaCreateRepuestoAsync = await session.CreateRepuestoAsync(repuestoName, repuestoProveedor, repuestoMarca);
+                                        string respuestaCreateRepuestoAsync = await session.CreateRepuestoAsync(repuestoName, repuestoProveedor, repuestoMarca, usernameConnected);
                                         await networkdatahelper.Send(respuestaCreateRepuestoAsync);
                                         break;
 
@@ -204,19 +166,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         // SRF3.Crear Categoría de repuesto. El sistema debe permitir crear una categoría para los repuestos.
                                         // CRF3. Alta de Categoría de repuesto. El sistema debe permitir crear una Categoría para los repuestos.
                                         string categoria = await networkdatahelper.Receive();
-                                        //await _agregarCategoria.WaitAsync();
-
-                                        //if (!session.GetCategorias().Contains(categoria))
-                                        //{
-                                        //    session.GetCategorias().Add(categoria);
-                                        //    await networkdatahelper.Send("exito");
-                                        //}
-                                        //else
-                                        //{
-                                        //    await networkdatahelper.Send("la categoria ya existe");
-                                        //}
-                                        //_agregarCategoria.Release();
-                                        string respuestaCreateCategoriaAsync = await session.CreateCategoriaAsync(categoria);
+                                        string respuestaCreateCategoriaAsync = await session.CreateCategoriaAsync(categoria, usernameConnected);
                                         await networkdatahelper.Send(respuestaCreateCategoriaAsync);
                                         break;
                                     case "3":
@@ -241,35 +191,8 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         string[] asociarCategoriaRequestConTodo = asociarCategoriaRequest.Split(ProtocolSpecification.fieldsSeparator);
                                         string repuestoName4 = asociarCategoriaRequestConTodo[0];
                                         string categoria4 = asociarCategoriaRequestConTodo[1];
-                                        string respuestaAsociarCategoriaAsync = await session.AsociarCategoriaAsync(repuestoName4, categoria4);
+                                        string respuestaAsociarCategoriaAsync = await session.AsociarCategoriaAsync(repuestoName4, categoria4, usernameConnected);
                                         await networkdatahelper.Send(respuestaAsociarCategoriaAsync);
-                                        //await _asociarCategoria.WaitAsync();
-
-                                        //var repuesto4 = session.GetRepuestos().Find(x => string.Equals(repuestoName4, x.Name));
-                                        //if (repuesto4 != null)
-                                        //{
-                                        //    if (!repuesto4.Categorias.Contains(categoria4)) // Verifica si la categoría ya está presente en el Repuesto
-                                        //    {
-                                        //        if (!session.GetCategorias().Contains(categoria4))
-                                        //        {
-                                        //            await networkdatahelper.Send("La categoría no existe");
-                                        //            break;
-                                        //        }
-                                        //        repuesto4.Categorias.Add(categoria4); // Agrega la nueva categoría al Repuesto
-                                        //        await networkdatahelper.Send("exito");
-                                        //    }
-                                        //    else
-                                        //    {
-                                        //        await networkdatahelper.Send("La categoría ya está presente en el Repuesto.");
-                                        //    }
-                                        //}
-                                        //else
-                                        //{
-                                        //    await networkdatahelper.Send("El repuesto no existe.");
-                                        //}
-
-                                        //_asociarCategoria.Release();
-
                                         break;
                                     case "4":
                                         //SRF5 Asociar una foto al repuesto. El sistema debe permitir subir una foto y asociarla a un repuesto específico.
@@ -293,6 +216,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         }
                                         else
                                         {
+                                            session.CreateLog($"El repuesto {nombreRepuestoOExit} al que se le quiere asociar una foto no existe", Action.Modify, usernameConnected, Status.Error);
                                             await networkdatahelper.Send("El repuesto no existe.");
                                             break;
                                         }
@@ -300,8 +224,8 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         string nombreArchivo = await fileCommsHandler.ReceiveFile();
                                         // el archivo queda guardado en el bin
                                         repuesto5.Foto = nombreArchivo;
+                                        session.CreateLog($"Al repuesto {nombreRepuestoOExit} se le asocio una foto", Action.Modify, usernameConnected);
                                         await networkdatahelper.Send("Se asocio la foto al repuesto.");
-
                                         break;
                                     case "5":
                                         // SRF6. Consultar repuestos existentes. El sistema deberá poder buscar repuestos existentes,incluyendo búsquedas por palabras claves.
@@ -317,6 +241,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                                 {
                                                     repuestosExistentesResponse.Add(x.ToStringListar());
                                                 });
+                                                session.CreateLog($"Se imprimen todos los repuesto", Action.Retrive, usernameConnected);
                                                 await networkdatahelper.Send(string.Join(ProtocolSpecification.fieldsSeparator, repuestosExistentesResponse));
                                                 break;
                                             case "2":
@@ -329,6 +254,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                                         repuestosExistentesResponse.Add(x.ToStringListar());
                                                     }
                                                 });
+                                                session.CreateLog($"Se imprimen todos los repuesto con el nombre {opcionListadoNombre}", Action.Retrive, usernameConnected);
                                                 await networkdatahelper.Send(string.Join(ProtocolSpecification.fieldsSeparator, repuestosExistentesResponse));
                                                 break;
                                             case "3":
@@ -341,6 +267,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                                         repuestosExistentesResponse.Add(x.ToStringListar());
                                                     }
                                                 });
+                                                session.CreateLog($"Se imprimen todos los repuesto con la categoria {opcionListadoCategoria}", Action.Retrive, usernameConnected);
                                                 await networkdatahelper.Send(string.Join(ProtocolSpecification.fieldsSeparator, repuestosExistentesResponse));
                                                 break;
                                             case "4":
@@ -353,6 +280,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                                         repuestosExistentesResponse.Add(x.ToStringListar());
                                                     }
                                                 });
+                                                session.CreateLog($"Se imprimen todos los repuesto con la foto deseada", Action.Retrive, usernameConnected);
                                                 await networkdatahelper.Send(string.Join(ProtocolSpecification.fieldsSeparator, repuestosExistentesResponse));
                                                 break;
                                             case "5":
@@ -365,6 +293,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                                         repuestosExistentesResponse.Add(x.ToStringListar());
                                                     }
                                                 });
+                                                session.CreateLog($"Se imprimen todos los repuesto con el proveedor {opcionListadoProveedor}", Action.Retrive, usernameConnected);
                                                 await networkdatahelper.Send(string.Join(ProtocolSpecification.fieldsSeparator, repuestosExistentesResponse));
                                                 break;
                                             case "6":
@@ -377,6 +306,7 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                                         repuestosExistentesResponse.Add(x.ToStringListar());
                                                     }
                                                 });
+                                                session.CreateLog($"Se imprimen todos los repuesto con la marca {opcionListadoMarca}", Action.Retrive, usernameConnected);
                                                 await networkdatahelper.Send(string.Join(ProtocolSpecification.fieldsSeparator, repuestosExistentesResponse));
                                                 break;
                                         }
@@ -412,12 +342,15 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         }
                                         else
                                         {
+                                            session.CreateLog($"El repuesto de nombre  {nombreRepuestoQuieroDetalles} no existe", Action.Retrive, usernameConnected, Status.Error);
                                             await networkdatahelper.Send("El repuesto no existe.");
                                         }
                                         string enviarFoto = await networkdatahelper.Receive();
                                         if (string.Equals(enviarFoto, "NO")) break;
                                         FileCommsHandler fileCommsHandler2 = new FileCommsHandler(tcpClientSocket);
                                         await fileCommsHandler2.SendFile(repuesto6.Foto);
+                                        session.CreateLog($"Se descargo la foto del repuesto {nombreRepuestoQuieroDetalles}", Action.Retrive, usernameConnected);
+
                                         break;
                                     case "7":
 
@@ -438,23 +371,27 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         Mensaje mensajeEnviado = new Mensaje(requestEnviarMensaje);
                                         if (string.Equals(mensajeEnviado.remitente, mensajeEnviado.destinatario))
                                         {
+                                            session.CreateLog($"El usuario {mensajeEnviado.destinatario} no puede enviarse un mensaje a si mismo", Action.Create, usernameConnected, Status.Error);
                                             await networkdatahelper.Send("No se puede enviar un mensaje a si mismo");
                                             break;
                                         }
                                         var usuarioDestintario = session.GetUsuarios().Find(x => string.Equals(mensajeEnviado.destinatario, x.userName));
                                         if (usuarioDestintario == null)
                                         {
-                                            await networkdatahelper.Send("El destinatario no es un mecanica valido.");
+                                            session.CreateLog($"El usuario {mensajeEnviado.destinatario} no es un mecanico valido", Action.Create, usernameConnected, Status.Error);
+                                            await networkdatahelper.Send("El destinatario no es un mecanico valido.");
                                             break;
                                         }
                                         if (string.IsNullOrEmpty(mensajeEnviado.cuerpoMensaje))
                                         {
+                                            session.CreateLog($"El cuerpo del mensaje no puede estar vacio", Action.Create, usernameConnected, Status.Error);
                                             await networkdatahelper.Send("El cuerpo del mensaje no puede estar vacio.");
                                             break;
                                         }
                                         // enviar respuesta a imprimir en el cliente
                                         session.GetMensajes().Add(mensajeEnviado);
                                         mensajeEnviado.ImprimirServer();
+                                        session.CreateLog($"El usuario {mensajeEnviado.remitente} le envio un mensaje a {mensajeEnviado.destinatario}", Action.Create, usernameConnected);
                                         await networkdatahelper.Send("Mensaje enviado. ");
                                         // CRF8.Enviar y recibir mensajes. El sistema debe permitir que un mecánico envíe mensajes
                                         // a otro, y que el mecánico receptor chequee sus mensajes sin leer, así como también revisar su historial de mensajes.
@@ -474,11 +411,13 @@ namespace GrpcSGrpcMainServer.ServerProgram
                                         List<Mensaje> mensajesNuevos;
                                         if (string.Equals(opcionElegidoLeer, "1"))
                                         {
+                                            session.CreateLog($"El usuario consulta sus mensajes nuevos", Action.Retrive, usernameConnected);
                                             mensajesNuevos = session.GetMensajes().FindAll(x => string.Equals(x.destinatario, usernameConnected) && !x.visto);
                                             await networkdatahelper.Send(string.Join(ProtocolSpecification.fieldsSeparator, mensajesNuevos));
                                         }
                                         else
                                         {
+                                            session.CreateLog($"El usuario consulta todos sus mensajes", Action.Retrive, usernameConnected);
                                             mensajesNuevos = session.GetMensajes().FindAll(x => string.Equals(x.destinatario, usernameConnected));
                                             await networkdatahelper.Send(string.Join(ProtocolSpecification.fieldsSeparator, mensajesNuevos));
                                         }
