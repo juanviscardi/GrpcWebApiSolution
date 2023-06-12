@@ -82,16 +82,12 @@ namespace GrpcMainServer.ServerProgram
             {
                 this.GetUsuarios().Add(user);
                 respuesta = "exito";
-                _ = CreateLog(user.ToString(), Action.Create, "test");
-                //await networkdatahelper.Send("exito");
-                //Console.WriteLine("Se Creo un nuevo usuario");
-                //Console.WriteLine(user.ToString());
-                //Console.WriteLine();
+                _ = CreateLog($"Se ha creado el usuario {name}", Action.Create, "admin");
             }
             else
             {
                 respuesta = "el usuario ya existe";
-                //await networkdatahelper.Send("el usuario ya existe");
+                _ = CreateLog($"El usuario {name} ya existe", Action.Create, "admin", Status.Error);
             }
 
             _agregarUsuario.Release();

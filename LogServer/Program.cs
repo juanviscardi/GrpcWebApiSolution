@@ -2,6 +2,10 @@ using LogServer.LogProgram;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using System.Text.Json.Serialization;
 
 namespace LogServer
 {
@@ -10,14 +14,14 @@ namespace LogServer
         public static void Main(string[] args)
         {
 
-            Thread receiverThread = new Thread(Receiver);
-            receiverThread.Start();
-
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -35,8 +39,9 @@ namespace LogServer
 
             app.UseAuthorization();
 
-
             app.MapControllers();
+
+            Task.Run(() => Receiver());
 
             app.Run();
         }
@@ -76,12 +81,13 @@ namespace LogServer
                     Console.WriteLine(" [x] Received {0}", message);
                     businessLogic.AddLog(message);
                     Console.WriteLine(" [x] Done");
-                    //channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                    channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
                 };
 
                 channel.BasicConsume(queue: "logs",
                     autoAck: false,
                     consumer: consumer);
+                Console.WriteLine(" Press [enter] to exit.");
                 Console.ReadLine();
             }
         }

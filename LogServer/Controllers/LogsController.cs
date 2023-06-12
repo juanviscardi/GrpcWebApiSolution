@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Common;
 using Common.Interfaces;
+using LogServer.LogProgram;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LogServer.Controllers
@@ -12,17 +13,19 @@ namespace LogServer.Controllers
     {
 
         static readonly ISettingsManager settingsMng = new SettingsManager();
-        public LogsController() {}
-
+        public LogsController() { }
 
         [HttpGet]
-        public async Task<ActionResult<List<Log>>> GetLogs()
+        public async Task<ActionResult<List<Log>>> GetLogs(
+            [FromQuery] string? contains = null,
+            [FromQuery] string? from = null,
+            [FromQuery] string? until = null,
+            [FromQuery] string? status = null,
+            [FromQuery] string? action = null,
+            [FromQuery] string? userName = null)
         {
-            Log mockLog1 = new Log("Creado con exito", Action.Create, "Pedrito");
-            Log mockLog2 = new Log("Creado con exito", Action.Create, "Martin");
-            List<Log> logs = new List<Log>();
-            logs.Add(mockLog1);
-            logs.Add(mockLog2);
+            BusinessLogic session = BusinessLogic.GetInstance();
+            List<Log> logs = session.GetLogs(contains, from, until, status, action, userName);
             return Ok(logs);
         }
     }
