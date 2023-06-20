@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+option csharp_namespace = "GrpcMainServer";
+
+package repuesto;
+
+service Repuesto {
+
+  rpc PostRepuesto(RepuestoRequest) returns (MessageReply);
+  rpc GetRepuesto(Id) returns (RepuestoResponse);
+  rpc PutRepuesto(RepuestoDTO) returns (MessageReply);
+  rpc DeleteRepuesto(Id) returns (MessageReply);
+  rpc GetRepuestos(Empty) returns (ListRepuestos);
+  rpc PatchRepuesto(Id) returns (MessageReply);
+}
+
+message RepuestoRequest {
+	string name = 1;
+	string proveedor = 2;
+	string marca = 3;
+}
+
+message RepuestoResponse {
+	bool found = 1;
+	string id = 2;
+	string name = 3;
+	string proveedor = 4;
+	string marca = 5;
+}
+
+message RepuestoDTO {
+	string id = 1;
+	string name = 2;
+	string proveedor = 3;
+	string marca = 4;
+}
+
+message ListRepuestos {
+    repeated RepuestoDTO repuestos = 1;
+}
+
+message MessageReply {
+	string message = 1;
+}
+
+message Id {
+	int32 id = 1;
+}
+
+message Empty {
+}

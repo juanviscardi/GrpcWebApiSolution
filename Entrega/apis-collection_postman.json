@@ -1,0 +1,221 @@
+{
+    "info": {
+        "_postman_id": "af2b4091-cf89-403c-83ef-c0ac6731ab1b",
+        "name": "Programacion de redes - obligatorio 3",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": ""
+    },
+    "item": [
+        {
+            "name": "Repuestos",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "https://localhost:9000/repuestos",
+                    "path": [
+                        "repuestos"
+                    ],
+                    "protocol": "https",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "9000"
+                },
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n\t\"name\": \"repuesto 5\",\n\t\"proveedor\": \"proveedor\",\n\t\"marca\": \"audi\"\n}"
+                }
+            }
+        },
+        {
+            "name": "Repuestos",
+            "request": {
+                "method": "PUT",
+                "url": {
+                    "raw": "https://localhost:9000/repuestos/1",
+                    "path": [
+                        "repuestos",
+                        "1"
+                    ],
+                    "protocol": "https",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "9000"
+                },
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n\t\"name\": \"repuesto modificado\",\n\t\"proveedor\": \"proveedor modificado\",\n\t\"marca\": \"audi modificado\"\n}"
+                }
+            }
+        },
+        {
+            "name": "Repuesto",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "https://localhost:9000/repuestos/1",
+                    "path": [
+                        "repuestos",
+                        "1"
+                    ],
+                    "protocol": "https",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "9000"
+                },
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Foto",
+            "request": {
+                "method": "PATCH",
+                "url": {
+                    "raw": "https://localhost:9000/repuestos/3",
+                    "path": [
+                        "repuestos",
+                        "3"
+                    ],
+                    "protocol": "https",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "9000"
+                },
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Repuestos",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "https://localhost:9000/repuestos",
+                    "path": [
+                        "repuestos"
+                    ],
+                    "protocol": "https",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "9000"
+                },
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Repuesto",
+            "request": {
+                "method": "DELETE",
+                "url": {
+                    "raw": "https://localhost:9000/repuestos/1",
+                    "path": [
+                        "repuestos",
+                        "1"
+                    ],
+                    "protocol": "https",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "9000"
+                },
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Logs",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "https://localhost:8000/logs",
+                    "query": [
+                        {
+                            "key": "status",
+                            "value": "Error",
+                            "disabled": true
+                        },
+                        {
+                            "key": "contains",
+                            "value": "art",
+                            "disabled": true
+                        },
+                        {
+                            "key": "action",
+                            "value": "Create",
+                            "disabled": true
+                        },
+                        {
+                            "key": "from",
+                            "value": "2023-06-11T22:29:06",
+                            "disabled": true
+                        },
+                        {
+                            "key": "until",
+                            "value": "2023-06-11T22:29:06",
+                            "disabled": true
+                        }
+                    ],
+                    "variable": [],
+                    "path": [
+                        "logs"
+                    ],
+                    "protocol": "https",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "8000"
+                },
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ]
+            }
+        }
+    ]
+}
